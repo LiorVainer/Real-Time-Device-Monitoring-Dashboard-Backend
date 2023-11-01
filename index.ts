@@ -1,5 +1,7 @@
 import express, { Request, Response } from "express";
 import WebSocket from "ws";
+import { ALERT_WS_TYPE } from "./models/alert.model";
+import { generateRamdomAlert } from "./utils/alert.utils";
 
 const app: express.Application = express();
 
@@ -12,12 +14,12 @@ const wss = new WebSocket.Server({ noServer: true });
 wss.on("connection", (ws: WebSocket) => {
   console.log("A user connected");
 
-  const sendRandomEvent = () => {
-    const randomEvent: number = Math.floor(Math.random() * 100);
-    ws.send(JSON.stringify({ type: "randomEvent", data: randomEvent }));
+  const sendRandomAlert = () => {
+    const newAlert = generateRamdomAlert();
+    ws.send(JSON.stringify({ type: ALERT_WS_TYPE, data: newAlert }));
   };
 
-  const interval: NodeJS.Timeout = setInterval(sendRandomEvent, 3000); // Every 3 seconds
+  const interval: NodeJS.Timeout = setInterval(sendRandomAlert, 3000); // Every 3 seconds
 
   ws.on("close", () => {
     console.log("User disconnected");
@@ -25,8 +27,8 @@ wss.on("connection", (ws: WebSocket) => {
   });
 });
 
-const server = app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
+const server = app.listen(5000, () => {
+  console.log("Server is running on http://localhost:5000");
 });
 
 server.on("upgrade", (request: Request, socket: any, head: Buffer) => {
